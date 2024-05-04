@@ -7,4 +7,8 @@ class CustomerSubscription < ApplicationRecord
   Active: 0,
   Cancelled: 1
   }
+
+  def cancel_subscription
+    self.status = 1
+  end
 end

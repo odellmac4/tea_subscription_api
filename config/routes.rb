@@ -9,6 +9,10 @@ Rails.application.routes.draw do
   # root "posts#index"
   namespace :api do
     namespace :v1 do
+      #I would refactor to have customer subscriptions to be within
+      #customer block but started on customer subscription routes before
+      #customer route
+      resources :customers, only: [:show]
       resources :customer_subscriptions, only: [:create, :update]
     end
   end

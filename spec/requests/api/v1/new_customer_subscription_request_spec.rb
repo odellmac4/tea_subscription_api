@@ -35,4 +35,38 @@ RSpec.describe 'Create a new subscription' do
     expect(created_sub_response[:data][:subscription]).to have_key (:tea)
     expect(created_sub_response[:data][:subscription][:tea]).to eq ("Black Tea")
   end
+
+  it 'returns error when customer does not exist' do
+    customer_sub_params = {
+      "customer_id": 100,
+      "subscription_id": @sub.id,
+      "tea_id": @black_tea.id
+    }
+
+    post '/api/v1/customer_subscriptions', params: customer_sub_params.to_json, headers: { 'Content-Type' => 'application/json' }
+    
+    expect(response.status).to eq(400)
+    
+    error_response = JSON.parse(response.body, symbolize_names: true)
+
+    expect(error_response[:errors]).to be_an Array
+    expect(error_response[:errors].first).to be_a Hash
+    expect(error_response[:errors].first[:detail]).to eq("Validation failed: Customer must exist")
+  end
+
+  it 'returns error when an attribute does not exist' do
+    customer_sub_params = {
+      "customer_id": @customer.id
+    }
+
+    post '/api/v1/customer_subscriptions', params: customer_sub_params.to_json, headers: { 'Content-Type' => 'application/json' }
+    
+    expect(response.status).to eq(400)
+    
+    error_response = JSON.parse(response.body, symbolize_names: true)
+
+    expect(error_response[:errors]).to be_an Array
+    expect(error_response[:errors].first).to be_a Hash
+    expect(error_response[:errors].first[:detail]).to eq("Validation failed: Subscription can't be blank, Tea can't be blank, Subscription must exist, Tea must exist")
+  end
 end

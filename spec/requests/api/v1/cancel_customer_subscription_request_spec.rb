@@ -32,4 +32,16 @@ RSpec.describe 'Cancel customer subscription' do
     expect(cancelled_sub_response[:data][:subscription]).to have_key (:tea)
     expect(cancelled_sub_response[:data][:subscription][:tea]).to eq ("Black Tea")
   end
+
+  it 'returns an error when customer subscription does not exist' do
+    patch "/api/v1/customer_subscriptions/20"
+
+    expect(response.status).to eq(404)
+
+    error_response = JSON.parse(response.body, symbolize_names: true)
+
+    expect(error_response[:errors]).to be_an Array
+    expect(error_response[:errors].first).to be_a Hash
+    expect(error_response[:errors].first[:detail]).to eq("Couldn't find CustomerSubscription with 'id'=20")
+  end
 end
